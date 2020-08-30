@@ -1,6 +1,6 @@
 {
   "name": "@rootsher/use-sheets-queue",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "use-sheets-queue hook for sheets management",
   "main": "src/index.tsx",
   "author": "Konrad Kowalski <rootsher@gmail.com>",

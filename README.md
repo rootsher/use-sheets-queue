@@ -6,6 +6,10 @@
 $ npm install --save @rootsher/use-sheets-queue
 ```
 
+## demo
+
+<img src="https://raw.githubusercontent.com/rootsher/use-sheets-queue/master/docs/assets/img/demo.gif">
+
 ## usage
 
 * sheets provider:
@@ -36,4 +40,16 @@ function App() {
         <Button onClick={() => push(A)}>push</Button>
     );
 }
+```
+
+## API
+
+```ts
+type Options = {
+    side?: 'left' | 'right' | 'bottom' | 'top';
+    size?: number;
+};
+
+function push(Element, options?: Options, previousOptions?: Options);
+function pop();
 ```
