@@ -142,13 +142,13 @@ export function SheetsProvider({ children }) {
                         <TransitionGroup>
                             {queue.map(({ Element, options }, index) => {
                                 const sheet = (state) => (
-                                    <Sheet key={index} state={state} {...options}>
+                                    <Sheet state={state} {...options}>
                                         <Element options={options} />
                                     </Sheet>
                                 );
 
                                 return (
-                                    <Transition key={Element} component={null} timeout={{ enter: 0, exit: duration }}>
+                                    <Transition key={index} component={null} timeout={{ enter: 0, exit: duration }}>
                                         {(state) => (
                                             <Fragment>
                                                 <Backdrop state={state} onClick={pop} />

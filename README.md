@@ -1,4 +1,10 @@
-# @rootsher/use-sheets-queue
+# [@rootsher/use-sheets-queue](https://github.com/rootsher/use-sheets-queue)
+
+[![npm version](https://img.shields.io/npm/v/@rootsher/use-sheets-queue.svg)](https://www.npmjs.com/package/@rootsher/use-sheets-queue)
+[![npm downloads](https://img.shields.io/npm/dm/@rootsher/use-sheets-queue.svg)](https://www.npmjs.com/package/@rootsher/use-sheets-queue)
+[![GitHub issues](https://img.shields.io/github/issues/rootsher/use-sheets-queue.svg)](https://github.com/rootsher/use-sheets-queue/issues)
+[![GitHub PRs](https://img.shields.io/github/issues-pr/rootsher/use-sheets-queue.svg)](https://github.com/rootsher/use-sheets-queue/pulls)
+[![ISC license](https://img.shields.io/npm/l/@rootsher/use-sheets-queue.svg)](https://opensource.org/licenses/ISC)
 
 ## installation
 
@@ -17,10 +23,10 @@ $ npm install --save @rootsher/use-sheets-queue
 ```tsx
 import { SheetsProvider } from 'use-sheets-queue';
 
-function App() {
+function Main() {
     return (
         <SheetsProvider>
-            {/* app */}
+            {/* App */}
         </SheetsProvider>
     );
 }
