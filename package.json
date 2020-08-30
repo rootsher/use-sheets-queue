@@ -1,0 +1,19 @@
+{
+  "name": "@rootsher/use-sheets-queue",
+  "version": "0.1.0",
+  "description": "use-sheets-queue hook for sheets management",
+  "main": "src/index.tsx",
+  "author": "Konrad Kowalski <rootsher@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "react": "^16.13.1",
+    "react-transition-group": "^4.4.1",
+    "styled-components": "^5.1.1"
+  },
+  "devDependencies": {
+    "@types/react": "^16.9.48",
+    "@types/react-transition-group": "^4.4.0",
+    "@types/styled-components": "^5.1.2",
+    "prettier": "^2.1.1"
+  }
+}
