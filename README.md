@@ -21,7 +21,7 @@ $ npm install --save @rootsher/use-sheets-queue
 * sheets provider:
 
 ```tsx
-import { SheetsProvider } from 'use-sheets-queue';
+import { SheetsProvider } from '@rootsher/use-sheets-queue';
 
 function Main() {
     return (
@@ -35,7 +35,7 @@ function Main() {
 * sheets management (LIFO - push, pop):
 
 ```tsx
-import { useSheetsQueue } from 'use-sheets-queue';
+import { useSheetsQueue } from '@rootsher/use-sheets-queue';
 
 import { A } from './sheets';
 
