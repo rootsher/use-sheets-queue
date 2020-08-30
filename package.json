@@ -1,7 +1,8 @@
 {
   "name": "@rootsher/use-sheets-queue",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "use-sheets-queue hook for sheets management",
+  "keywords": ["sheets", "queue", "modal", "popup"],
   "main": "src/index.tsx",
   "author": "Konrad Kowalski <rootsher@gmail.com>",
   "license": "ISC",
