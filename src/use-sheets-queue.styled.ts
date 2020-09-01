@@ -1,6 +1,10 @@
 import styled, { css } from 'styled-components';
+import { TransitionStatus } from 'react-transition-group/Transition';
 
-const duration = 400; // ms
+import { SheetOptions } from './use-sheets-queue';
+import { FC } from 'react';
+
+const duration: number = 400; // ms
 const sides = {
     top: [1, 1, 0, 1],
     right: [1, 1, 1, 0],
@@ -8,7 +12,7 @@ const sides = {
     left: [1, 0, 1, 1],
 };
 
-export const Container = styled.div`
+export const Container = styled.div<{ visible: boolean }>`
     position: absolute;
     top: 0;
     right: 0;
@@ -18,18 +22,18 @@ export const Container = styled.div`
     display: ${({ visible }) => (visible ? 'block' : 'none')};
 `;
 
-export const Backdrop = styled.div`
+export const Backdrop = styled.div<{ status: TransitionStatus }>`
     position: absolute;
     background-color: #000;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
-    opacity: ${({ state }) => (state === 'entered' ? 0.32 : 0)};
+    opacity: ${({ status }) => (status === 'entered' ? 0.32 : 0)};
     transition: opacity ${duration}ms;
 `;
 
-export const Sheet = styled.div`
+export const Sheet: FC<{ status: TransitionStatus }> = styled.div<{ status: TransitionStatus } & SheetOptions>`
     position: absolute;
     box-shadow: 0 0 10px -5px rgba(0, 0, 0, 0.2), 0 0 24px 2px rgba(0, 0, 0, 0.14), 0 0 30px 5px rgba(0, 0, 0, 0.12);
     background-color: #f1f3f4;
@@ -48,14 +52,14 @@ export const Sheet = styled.div`
                 ${side}: ${sides[props.side][index] ? 0 : 'auto'};
             `
         )}
-    transform: ${({ state, side }) => css`
+    transform: ${({ status, side }) => css`
         ${['left', 'right'].includes(side) &&
         `translateX(
-          ${state === 'entered' ? 0 : `${`${(side === 'left' ? -1 : 1) * 100}%`}`}
+          ${status === 'entered' ? 0 : `${`${(side === 'left' ? -1 : 1) * 100}%`}`}
         )`}
         ${['top', 'bottom'].includes(side) &&
         `translateY(
-          ${state === 'entered' ? 0 : `${`${(side === 'top' ? -1 : 1) * 100}%`}`}
+          ${status === 'entered' ? 0 : `${`${(side === 'top' ? -1 : 1) * 100}%`}`}
         )`}
     `};
     transition: width ${duration}ms, height ${duration}ms, transform ${duration}ms;

@@ -1,17 +1,23 @@
-import React, { Fragment, createContext, useContext, useState, ReactElement } from 'react';
+import React, { Fragment, createContext, useContext, useState, FC, ComponentType } from 'react';
 import { Transition, TransitionGroup } from 'react-transition-group';
+import { TransitionStatus } from 'react-transition-group/Transition';
 
-import * as styled from './index.styled';
+import * as styled from './use-sheets-queue.styled';
 
 const duration = 400; // ms
 
-const SheetsContext = createContext(null);
+const SheetsContext = createContext([
+    (Element: ComponentType<{ options?: SheetOptions }>, options?: SheetOptions, previousOptions?: SheetOptions) => {},
+    () => {},
+]);
+
+type Side = 'left' | 'right' | 'bottom' | 'top';
 
 export class SheetOptions {
-    public readonly side?: 'left' | 'right' | 'bottom' | 'top';
-    public readonly size?: number;
+    public readonly side: Side;
+    public readonly size: number;
 
-    constructor(side?, size?) {
+    constructor(side?: Side, size?: number) {
         this.side = side || 'right';
         this.size = size || 50;
     }
@@ -19,14 +25,16 @@ export class SheetOptions {
 
 class Sheet {
     // property using for swap operation (read-only)
-    public readonly defaultOptions?: SheetOptions;
+    public readonly defaultOptions: SheetOptions = new SheetOptions();
 
     constructor(
-        public readonly Element: ReactElement,
+        public readonly Element: ComponentType<{ options?: SheetOptions }>,
         public options?: SheetOptions,
         public readonly previousOptions?: SheetOptions
     ) {
-        this.defaultOptions = options;
+        if (options) {
+            this.defaultOptions = options;
+        }
     }
 
     updateOptions(options: SheetOptions) {
@@ -37,16 +45,23 @@ class Sheet {
     }
 }
 
-export function SheetsProvider({ children }) {
+export const SheetsProvider: FC = ({ children }) => {
     const [queue, setQueue] = useState<Sheet[]>([]);
 
-    function push(Element: ReactElement, options?: SheetOptions, previousOptions?: SheetOptions) {
+    function push(
+        Element: ComponentType<{ options?: SheetOptions }>,
+        options?: SheetOptions,
+        previousOptions?: SheetOptions
+    ) {
         const lastSheet = queue.slice(-1)[0];
         const newQueue = queue.slice(0, -1);
 
         // if last element exists - overwrite options in previous element
         if (lastSheet) {
-            lastSheet.updateOptions(previousOptions);
+            if (previousOptions) {
+                lastSheet.updateOptions(previousOptions);
+            }
+
             newQueue.push(lastSheet);
         }
 
@@ -72,22 +87,22 @@ export function SheetsProvider({ children }) {
         <SheetsContext.Provider value={[push, pop]}>
             {children}
             <Transition component={null} in={queue.length > 0} timeout={{ enter: 0, exit: duration }}>
-                {(state) => (
-                    <styled.Container visible={!['exited'].includes(state)}>
+                {(status) => (
+                    <styled.Container visible={!['exited'].includes(status)}>
                         <TransitionGroup>
                             {queue.map((sheet, index) => {
-                                const $sheet = (state) => (
-                                    <styled.Sheet state={state} {...sheet.options}>
+                                const $sheet = (status: TransitionStatus) => (
+                                    <styled.Sheet status={status} {...sheet.options}>
                                         <sheet.Element options={sheet.options} />
                                     </styled.Sheet>
                                 );
 
                                 return (
                                     <Transition key={index} component={null} timeout={{ enter: 0, exit: duration }}>
-                                        {(state) => (
+                                        {(status) => (
                                             <Fragment>
-                                                <styled.Backdrop state={state} onClick={pop} />
-                                                {$sheet(state)}
+                                                <styled.Backdrop status={status} onClick={pop} />
+                                                {$sheet(status)}
                                             </Fragment>
                                         )}
                                     </Transition>
@@ -99,7 +114,7 @@ export function SheetsProvider({ children }) {
             </Transition>
         </SheetsContext.Provider>
     );
-}
+};
 
 export function useSheetsQueue() {
     const [push, pop] = useContext(SheetsContext);
