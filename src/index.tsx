@@ -1,136 +1,71 @@
-import React, { Fragment, createContext, useContext, useState } from 'react';
-import styled, { css } from 'styled-components';
+import React, { Fragment, createContext, useContext, useState, ReactElement } from 'react';
 import { Transition, TransitionGroup } from 'react-transition-group';
+
+import * as styled from './index.styled';
 
 const duration = 400; // ms
 
-const Container = styled.div`
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    overflow: hidden;
-    display: ${({ visible }) => (visible ? 'block' : 'none')};
-`;
+const SheetsContext = createContext(null);
 
-const Backdrop = styled.div`
-    position: absolute;
-    background-color: #000;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    opacity: ${({ state }) => (state === 'entered' ? 0.32 : 0)};
-    transition: opacity ${duration}ms;
-`;
+export class SheetOptions {
+    public readonly side?: 'left' | 'right' | 'bottom' | 'top';
+    public readonly size?: number;
 
-const sides = {
-    top: [1, 1, 0, 1],
-    right: [1, 1, 1, 0],
-    bottom: [0, 1, 1, 1],
-    left: [1, 0, 1, 1],
-};
+    constructor(side?, size?) {
+        this.side = side || 'right';
+        this.size = size || 50;
+    }
+}
 
-const Sheet = styled.div`
-    position: absolute;
-    box-shadow: 0 0 10px -5px rgba(0, 0, 0, 0.2), 0 0 24px 2px rgba(0, 0, 0, 0.14), 0 0 30px 5px rgba(0, 0, 0, 0.12);
-    background-color: #f1f3f4;
-    overflow: auto;
-    ${({ side, size }) =>
-        ['top', 'bottom'].includes(side)
-            ? css`
-                  height: ${size}%;
-              `
-            : css`
-                  width: ${size}%;
-              `};
-    ${(props) =>
-        ['top', 'right', 'bottom', 'left'].map(
-            (side, index) => css`
-                ${side}: ${sides[props.side][index] ? 0 : 'auto'};
-            `
-        )}
-    transform: ${({ state, side }) => css`
-        ${['left', 'right'].includes(side) &&
-        `translateX(
-          ${state === 'entered' ? 0 : `${`${(side === 'left' ? -1 : 1) * 100}%`}`}
-        )`}
-        ${['top', 'bottom'].includes(side) &&
-        `translateY(
-          ${state === 'entered' ? 0 : `${`${(side === 'top' ? -1 : 1) * 100}%`}`}
-        )`}
-    `};
-    transition: width ${duration}ms, height ${duration}ms, transform ${duration}ms;
-`;
+class Sheet {
+    // property using for swap operation (read-only)
+    public readonly defaultOptions?: SheetOptions;
 
-type Options = {
-    side?: 'left' | 'right' | 'bottom' | 'top';
-    size?: number;
-};
+    constructor(
+        public readonly Element: ReactElement,
+        public options?: SheetOptions,
+        public readonly previousOptions?: SheetOptions
+    ) {
+        this.defaultOptions = options;
+    }
 
-const SheetsContext = createContext([
-    (Element, options: Options) => {}, // push
-    () => {}, // pop
-]);
+    updateOptions(options: SheetOptions) {
+        this.options = {
+            ...this.options,
+            ...options,
+        };
+    }
+}
 
 export function SheetsProvider({ children }) {
-    const [queue, setQueue] = useState<
-        {
-            Element: any;
-            defaultOptions: Options;
-            options?: Options;
-        }[]
-    >([]);
+    const [queue, setQueue] = useState<Sheet[]>([]);
 
-    function push(Element, options?: Options, previousOptions?: Options) {
-        const defaultOptions: Options = {
-            side: 'right',
-            size: 50,
-        };
-        const lastElement = queue.slice(-1)[0];
-        const newQueue = [...queue.slice(0, -1)];
+    function push(Element: ReactElement, options?: SheetOptions, previousOptions?: SheetOptions) {
+        const lastSheet = queue.slice(-1)[0];
+        const newQueue = queue.slice(0, -1);
 
         // if last element exists - overwrite options in previous element
-        if (lastElement) {
-            newQueue.push({
-                ...lastElement,
-                options: {
-                    ...lastElement.options,
-                    ...previousOptions,
-                },
-            });
+        if (lastSheet) {
+            lastSheet.updateOptions(previousOptions);
+            newQueue.push(lastSheet);
         }
 
-        newQueue.push({
-            Element,
-            // property using for swap operation (read-only)
-            defaultOptions: options,
-            options: {
-                ...defaultOptions,
-                ...options,
-            },
-        });
+        newQueue.push(new Sheet(Element, options, previousOptions));
 
         setQueue(newQueue);
     }
 
     function pop() {
-        const beforeLast = queue[queue.length - 2];
+        const beforeLastSheet = queue[queue.length - 2];
 
         // if before last element exists - undo to default options and remove last element
-        setQueue(
-            beforeLast
-                ? [
-                      ...queue.slice(0, -2),
-                      {
-                          ...beforeLast,
-                          // swap operation
-                          options: beforeLast.defaultOptions,
-                      },
-                  ]
-                : []
-        );
+        if (beforeLastSheet) {
+            beforeLastSheet.updateOptions(beforeLastSheet.defaultOptions);
+
+            setQueue([...queue.slice(0, -2), beforeLastSheet]);
+        } else {
+            setQueue([]);
+        }
     }
 
     return (
@@ -138,28 +73,28 @@ export function SheetsProvider({ children }) {
             {children}
             <Transition component={null} in={queue.length > 0} timeout={{ enter: 0, exit: duration }}>
                 {(state) => (
-                    <Container visible={!['exited'].includes(state)}>
+                    <styled.Container visible={!['exited'].includes(state)}>
                         <TransitionGroup>
-                            {queue.map(({ Element, options }, index) => {
-                                const sheet = (state) => (
-                                    <Sheet state={state} {...options}>
-                                        <Element options={options} />
-                                    </Sheet>
+                            {queue.map((sheet, index) => {
+                                const $sheet = (state) => (
+                                    <styled.Sheet state={state} {...sheet.options}>
+                                        <sheet.Element options={sheet.options} />
+                                    </styled.Sheet>
                                 );
 
                                 return (
                                     <Transition key={index} component={null} timeout={{ enter: 0, exit: duration }}>
                                         {(state) => (
                                             <Fragment>
-                                                <Backdrop state={state} onClick={pop} />
-                                                {sheet(state)}
+                                                <styled.Backdrop state={state} onClick={pop} />
+                                                {$sheet(state)}
                                             </Fragment>
                                         )}
                                     </Transition>
                                 );
                             })}
                         </TransitionGroup>
-                    </Container>
+                    </styled.Container>
                 )}
             </Transition>
         </SheetsContext.Provider>
