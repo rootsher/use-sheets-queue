@@ -1,13 +1,22 @@
 {
   "name": "@rootsher/use-sheets-queue",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "use-sheets-queue hook for sheets management",
-  "keywords": ["sheets", "queue", "modal", "popup"],
-  "main": "src/index.tsx",
+  "keywords": [
+    "sheets",
+    "queue",
+    "modal",
+    "popup"
+  ],
+  "scripts": {
+    "build": "rm -rf ./lib && tsc",
+    "prepare": "npm run build"
+  },
+  "main": "lib/index.js",
   "author": "Konrad Kowalski <rootsher@gmail.com>",
   "license": "ISC",
   "files": [
-    "src/",
+    "lib/",
     "README.md"
   ],
   "dependencies": {
@@ -19,6 +28,8 @@
     "@types/react": "^16.9.48",
     "@types/react-transition-group": "^4.4.0",
     "@types/styled-components": "^5.1.2",
-    "prettier": "^2.1.1"
+    "prettier": "^2.1.1",
+    "tsc": "^1.20150623.0",
+    "typescript": "^4.0.2"
   }
 }
