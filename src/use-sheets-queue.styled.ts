@@ -20,6 +20,7 @@ export const Container = styled.div<{ visible: boolean }>`
     left: 0;
     overflow: hidden;
     display: ${({ visible }) => (visible ? 'block' : 'none')};
+    z-index: 2000;
 `;
 
 export const Backdrop = styled.div<{ status: TransitionStatus }>`

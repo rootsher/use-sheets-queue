@@ -1,6 +1,6 @@
 {
   "name": "@rootsher/use-sheets-queue",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "use-sheets-queue hook for sheets management",
   "keywords": [
     "sheets",
