@@ -37,7 +37,7 @@ export const Backdrop = styled.div<{ status: TransitionStatus }>`
 export const Sheet: FC<{ status: TransitionStatus }> = styled.div<{ status: TransitionStatus } & SheetOptions>`
     position: absolute;
     box-shadow: 0 0 10px -5px rgba(0, 0, 0, 0.2), 0 0 24px 2px rgba(0, 0, 0, 0.14), 0 0 30px 5px rgba(0, 0, 0, 0.12);
-    background-color: #f1f3f4;
+    background-color: #FFF;
     overflow: auto;
     ${({ side, size }) =>
         ['top', 'bottom'].includes(side)
